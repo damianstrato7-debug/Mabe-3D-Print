@@ -3,144 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Impresión 3D - Mabe San Luis</title>
+    <title>Diseño e Ingeniería - Mabe San Luis</title>
     <!-- Google Fonts & FontAwesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <div class="background-overlay"></div>
+    <!-- Fondo dinámico con overlay oscuro -->
+    <div class="bg-overlay"></div>
 
     <div class="main-container">
         <!-- Encabezado / Branding -->
         <header class="header">
-            <div class="logo-area">
-                <i class="fa-solid fa-cube logo-icon"></i>
-                <div>
-                    <h1>Diseño e Ingeniería</h1>
-                    <h2>Mabe San Luis Potosí</h2>
-                </div>
+            <div class="logo">
+                <i class="fa-solid fa-compass-drafting logo-icon"></i>
+                <span>Diseño e Ingeniería / <b>Mabe San Luis</b></span>
             </div>
-            <p class="tagline">Gestión e Impresión 3D Industrial</p>
+            <p class="subtitle">Gestión e Impresión 3D Industrial</p>
         </header>
 
-        <!-- Pestañas de Navegación -->
-        <nav class="tabs-nav">
-            <button class="tab-btn active" id="btn-tab-nuevo" onclick="switchTab('nuevo')">
-                <i class="fa-solid fa-plus-circle"></i> Nuevo Pedido
-            </button>
-            <button class="tab-btn" id="btn-tab-buscar" onclick="switchTab('buscar')">
-                <i class="fa-solid fa-magnifying-glass"></i> Ver Mi Pedido
-            </button>
-        </nav>
-
-        <!-- SECCIÓN 1: FORMULARIO NUEVO PEDIDO -->
-        <section id="section-nuevo" class="tab-content active">
-            <form id="form-pedido" onsubmit="guardarPedido(event)">
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nombre"><i class="fa-solid fa-user"></i> Nombre del Requisitor *</label>
-                        <input type="text" id="nombre" required placeholder="Ej. Juan Pérez">
-                    </div>
-                    <div class="form-group">
-                        <label for="email"><i class="fa-solid fa-envelope"></i> Correo Electrónico *</label>
-                        <input type="email" id="email" required placeholder="juan.perez@mabe.com.mx">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="area"><i class="fa-solid fa-industry"></i> Área Solicitante *</label>
-                        <select id="area" required>
-                            <option value="" disabled selected>Selecciona un área...</option>
-                            <option value="CAL">Calidad (CAL)</option>
-                            <option value="MAN">Manufactura (MAN)</option>
-                            <option value="MCTO">MCTO</option>
-                            <option value="ING">Ingeniería de Producto (ING)</option>
-                            <option value="SEG">Seguridad / EHS (SEG)</option>
-                            <option value="ALM">Almacén / Logística (ALM)</option>
-                            <option value="OTR">Otra Área</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tipoSolicitud"><i class="fa-solid fa-gears"></i> Tipo de Solicitud *</label>
-                        <select id="tipoSolicitud" required>
-                            <option value="" disabled selected>Selecciona el tipo...</option>
-                            <option value="Fixture / JIG">Fixture / JIG de Ensamble</option>
-                            <option value="Galga / Poka-Yoke">Galga / Poka-Yoke</option>
-                            <option value="Refacción / Repuesto">Refacción / Repuesto de Maquinaria</option>
-                            <option value="Prototipo">Prototipo de Producto</option>
-                            <option value="Mejora Ergonomía">Mejora de Ergonomía / AMEF</option>
-                            <option value="Otro">Otro</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="prioridad"><i class="fa-solid fa-triangle-exclamation"></i> Prioridad *</label>
-                        <select id="prioridad" required>
-                            <option value="Alta">Alta</option>
-                            <option value="Media" selected>Media</option>
-                            <option value="Baja">Baja</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="linkArchivo"><i class="fa-solid fa-link"></i> Link al Archivo 3D (OneDrive / SharePoint)</label>
-                        <input type="url" id="linkArchivo" placeholder="https://mabe.sharepoint.com/...">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="descripcion"><i class="fa-solid fa-align-left"></i> Descripción del Requerimiento *</label>
-                    <textarea id="descripcion" rows="4" required placeholder="Describe las dimensiones aproximadas, uso que se le dará, si requiere resistencia mecánica o térmica especial..."></textarea>
-                </div>
-
-                <button type="submit" class="btn-submit">
-                    <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud de Impresión
+        <!-- Tarjeta Principal de Menú -->
+        <main class="card glass-card">
+            <div class="menu-buttons">
+                <button id="btn-tab-nuevo" class="btn btn-tab active" onclick="switchTab('nuevo')">
+                    <i class="fa-solid fa-plus-circle"></i> Nuevo Pedido
                 </button>
-            </form>
-        </section>
+                <button id="btn-tab-buscar" class="btn btn-tab" onclick="switchTab('buscar')">
+                    <i class="fa-solid fa-magnifying-glass"></i> Ver Mi Pedido
+                </button>
+            </div>
 
-        <!-- SECCIÓN 2: RASTREO / CONSULTA DE ESTADO -->
-        <section id="section-buscar" class="tab-content">
-            <div class="search-box">
-                <h3><i class="fa-solid fa-ticket"></i> Consulta el estado de tu pieza</h3>
-                <p>Ingresa el código de ticket que se te asignó al crear tu solicitud (Ej: #MCTO-4821)</p>
+            <!-- SECCIÓN 1: FORMULARIO DE NUEVO PEDIDO -->
+            <section id="section-nuevo" class="tab-content active">
+                <h2>Solicitar Impresión 3D</h2>
+                <form id="form-pedido" onsubmit="guardarPedido(event)">
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre"><i class="fa-solid fa-user"></i> Nombre del Requisitor *</label>
+                            <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email"><i class="fa-solid fa-envelope"></i> Correo Electrónico *</label>
+                            <input type="email" id="email" placeholder="juan.perez@mabe.com" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="area"><i class="fa-solid fa-industry"></i> Área Solicitante *</label>
+                            <select id="area" required>
+                                <option value="" disabled selected>Selecciona un área...</option>
+                                <option value="CAL">Calidad</option>
+                                <option value="MAN">Manufactura</option>
+                                <option value="MCTO">MCTO</option>
+                                <option value="TI">Sistemas / TI</option>
+                                <option value="ING">Ingeniería</option>
+                                <option value="PROD">Producción</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tipoSolicitud"><i class="fa-solid fa-layer-group"></i> Tipo de Solicitud *</label>
+                            <select id="tipoSolicitud" required>
+                                <option value="Impresion">Solo Impresión (Tengo el archivo 3D)</option>
+                                <option value="Diseño + Impresion">Diseño + Impresión 3D</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="prioridad"><i class="fa-solid fa-triangle-exclamation"></i> Prioridad *</label>
+                            <select id="prioridad" required>
+                                <option value="Alta">Alta</option>
+                                <option value="Media" selected>Media</option>
+                                <option value="Baja">Baja</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="linkArchivo"><i class="fa-solid fa-link"></i> Link a Archivo / Plano (Opcional)</label>
+                            <input type="url" id="linkArchivo" placeholder="OneDrive, SharePoint, Drive, etc.">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="descripcion"><i class="fa-solid fa-align-left"></i> Descripción / Requerimiento Técnico *</label>
+                        <textarea id="descripcion" rows="4" placeholder="Detalla dimensiones, esfuerzo mecánico, temperatura o uso que tendrá la pieza..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud
+                    </button>
+                </form>
+            </section>
+
+            <!-- SECCIÓN 2: CONSULTAR ESTADO DE PEDIDO -->
+            <section id="section-buscar" class="tab-content">
+                <h2>Consulta el Estado de tu Pieza</h2>
+                <p class="section-desc">Ingresa el código único asignado al momento de tu solicitud.</p>
                 
-                <div class="input-group">
-                    <input type="text" id="input-codigo" placeholder="Ej: #MAN-1024" uppercase>
-                    <button type="button" onclick="consultarPedido()"><i class="fa-solid fa-search"></i> Buscar</button>
+                <div class="search-box">
+                    <input type="text" id="input-codigo" placeholder="Ej: #CAL-8492" style="text-transform:uppercase">
+                    <button class="btn btn-primary" onclick="consultarPedido()">
+                        <i class="fa-solid fa-search"></i> Buscar
+                    </button>
                 </div>
-            </div>
 
-            <div id="resultado-busqueda" class="hidden">
-                <!-- Se llena dinámicamente con app.js -->
-            </div>
-        </section>
+                <!-- Resultado de la búsqueda -->
+                <div id="resultado-busqueda" class="status-card-container hidden">
+                    <!-- JS inyectará el estado dinámicamente aquí -->
+                </div>
+            </section>
+        </main>
     </div>
 
-    <!-- MODAL CONFIRMACIÓN DE CREACIÓN -->
-    <div id="modal-exito" class="modal hidden">
-        <div class="modal-content">
-            <i class="fa-solid fa-circle-check modal-icon"></i>
-            <h2>¡Solicitud Registrada!</h2>
-            <p>Tu pedido ha sido enviado con éxito al departamento de Diseño e Ingeniería.</p>
-            
-            <div class="ticket-badge">
-                <span>Tu Código de Ticket:</span>
+    <!-- MODAL: CONFIRMACIÓN DE PEDIDO GUARDADO -->
+    <div id="modal-exito" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <h3>¡Solicitud Registrada!</h3>
+            <p>Tu pedido fue enviado con éxito al taller de impresión 3D.</p>
+            <div class="ticket-code-box">
+                <span>Tu Código de Seguimiento:</span>
                 <strong id="ticket-codigo">#CAL-0000</strong>
             </div>
-
-            <p class="modal-note"><i class="fa-solid fa-circle-info"></i> Guarda este código para rastrear el estatus de tu impresión.</p>
-            <button onclick="cerrarModal()" class="btn-modal">Aceptar</button>
+            <p class="modal-subtext">Guarda este código para consultar el estado.</p>
+            <button class="btn btn-primary" onclick="cerrarModal()">Entendido</button>
         </div>
     </div>
+
+    <!-- Script de soporte para alternar pestañas directamente -->
+    <script>
+        function switchTab(tab) {
+            const tabNuevo = document.getElementById('section-nuevo');
+            const tabBuscar = document.getElementById('section-buscar');
+            const btnNuevo = document.getElementById('btn-tab-nuevo');
+            const btnBuscar = document.getElementById('btn-tab-buscar');
+
+            if (tab === 'nuevo') {
+                tabNuevo.classList.add('active');
+                tabBuscar.classList.remove('active');
+                btnNuevo.classList.add('active');
+                btnBuscar.classList.remove('active');
+            } else {
+                tabNuevo.classList.remove('active');
+                tabBuscar.classList.add('active');
+                btnNuevo.classList.remove('active');
+                btnBuscar.classList.add('active');
+            }
+        }
+    </script>
 
     <!-- Vincular el script JS como módulo -->
     <script type="module" src="app.js"></script>
