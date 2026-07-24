@@ -1,162 +1,58 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diseño e Ingeniería - Mabe San Luis</title>
-    <!-- Google Fonts & FontAwesome Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal del Solicitante</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <!-- Fondo dinámico con overlay oscuro -->
-    <div class="bg-overlay"></div>
+  <div class="dashboard-container">
+    <!-- Encabezado -->
+    <header class="header">
+      <h2>Portal del Solicitante</h2>
+      <span class="user-name">Hola, Juan Pérez</span>
+    </header>
 
-    <div class="main-container">
-        <!-- Encabezado / Branding -->
-        <header class="header">
-            <div class="logo">
-                <i class="fa-solid fa-compass-drafting logo-icon"></i>
-                <span>Diseño e Ingeniería / <b>Mabe San Luis</b></span>
-            </div>
-            <p class="subtitle">Gestión e Impresión 3D Industrial</p>
-        </header>
+    <!-- Resumen de la Solicitud -->
+    <main class="content">
+      <section class="card status-card">
+        <h3>Estado de tu Solicitud</h3>
+        <p class="application-id">ID de Trámite: <strong>#SOL-2026-8941</strong></p>
 
-        <!-- Tarjeta Principal de Menú -->
-        <main class="card glass-card">
-            <div class="menu-buttons">
-                <button id="btn-tab-nuevo" class="btn btn-tab active" onclick="switchTab('nuevo')">
-                    <i class="fa-solid fa-plus-circle"></i> Nuevo Pedido
-                </button>
-                <button id="btn-tab-buscar" class="btn btn-tab" onclick="switchTab('buscar')">
-                    <i class="fa-solid fa-magnifying-glass"></i> Ver Mi Pedido
-                </button>
-            </div>
-
-            <!-- SECCIÓN 1: FORMULARIO DE NUEVO PEDIDO -->
-            <section id="section-nuevo" class="tab-content active">
-                <h2>Solicitar Impresión 3D</h2>
-                <form id="form-pedido" onsubmit="guardarPedido(event)">
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nombre"><i class="fa-solid fa-user"></i> Nombre del Requisitor *</label>
-                            <input type="text" id="nombre" placeholder="Ej: Juan Pérez" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="email"><i class="fa-solid fa-envelope"></i> Correo Electrónico *</label>
-                            <input type="email" id="email" placeholder="juan.perez@mabe.com" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="area"><i class="fa-solid fa-industry"></i> Área Solicitante *</label>
-                            <select id="area" required>
-                                <option value="" disabled selected>Selecciona un área...</option>
-                                <option value="CAL">Calidad</option>
-                                <option value="MAN">Manufactura</option>
-                                <option value="MCTO">MCTO</option>
-                                <option value="TI">Sistemas / TI</option>
-                                <option value="ING">Ingeniería</option>
-                                <option value="PROD">Producción</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="tipoSolicitud"><i class="fa-solid fa-layer-group"></i> Tipo de Solicitud *</label>
-                            <select id="tipoSolicitud" required>
-                                <option value="Impresion">Solo Impresión (Tengo el archivo 3D)</option>
-                                <option value="Diseño + Impresion">Diseño + Impresión 3D</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="prioridad"><i class="fa-solid fa-triangle-exclamation"></i> Prioridad *</label>
-                            <select id="prioridad" required>
-                                <option value="Alta">Alta</option>
-                                <option value="Media" selected>Media</option>
-                                <option value="Baja">Baja</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="linkArchivo"><i class="fa-solid fa-link"></i> Link a Archivo / Plano (Opcional)</label>
-                            <input type="url" id="linkArchivo" placeholder="OneDrive, SharePoint, Drive, etc.">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="descripcion"><i class="fa-solid fa-align-left"></i> Descripción / Requerimiento Técnico *</label>
-                        <textarea id="descripcion" rows="4" placeholder="Detalla dimensiones, esfuerzo mecánico, temperatura o uso que tendrá la pieza..." required></textarea>
-                    </div>
-
-                    <button type="submit" class="btn btn-primary btn-block">
-                        <i class="fa-solid fa-paper-plane"></i> Enviar Solicitud
-                    </button>
-                </form>
-            </section>
-
-            <!-- SECCIÓN 2: CONSULTAR ESTADO DE PEDIDO -->
-            <section id="section-buscar" class="tab-content">
-                <h2>Consulta el Estado de tu Pieza</h2>
-                <p class="section-desc">Ingresa el código único asignado al momento de tu solicitud.</p>
-                
-                <div class="search-box">
-                    <input type="text" id="input-codigo" placeholder="Ej: #CAL-8492" style="text-transform:uppercase">
-                    <button class="btn btn-primary" onclick="consultarPedido()">
-                        <i class="fa-solid fa-search"></i> Buscar
-                    </button>
-                </div>
-
-                <!-- Resultado de la búsqueda -->
-                <div id="resultado-busqueda" class="status-card-container hidden">
-                    <!-- JS inyectará el estado dinámicamente aquí -->
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- MODAL: CONFIRMACIÓN DE PEDIDO GUARDADO -->
-    <div id="modal-exito" class="modal-backdrop hidden">
-        <div class="modal-card">
-            <div class="modal-icon"><i class="fa-solid fa-circle-check"></i></div>
-            <h3>¡Solicitud Registrada!</h3>
-            <p>Tu pedido fue enviado con éxito al taller de impresión 3D.</p>
-            <div class="ticket-code-box">
-                <span>Tu Código de Seguimiento:</span>
-                <strong id="ticket-codigo">#CAL-0000</strong>
-            </div>
-            <p class="modal-subtext">Guarda este código para consultar el estado.</p>
-            <button class="btn btn-primary" onclick="cerrarModal()">Entendido</button>
+        <!-- Barra de Progreso -->
+        <div class="progress-tracker">
+          <div class="step completed">1. Enviado</div>
+          <div class="step active" id="step-revision">2. En Revisión</div>
+          <div class="step" id="step-approval">3. Resolución</div>
         </div>
-    </div>
 
-    <!-- Script de soporte para alternar pestañas directamente -->
-    <script>
-        function switchTab(tab) {
-            const tabNuevo = document.getElementById('section-nuevo');
-            const tabBuscar = document.getElementById('section-buscar');
-            const btnNuevo = document.getElementById('btn-tab-nuevo');
-            const btnBuscar = document.getElementById('btn-tab-buscar');
+        <div class="status-badge" id="status-badge">
+          Estado actual: <strong id="status-text">En Revisión</strong>
+        </div>
+      </section>
 
-            if (tab === 'nuevo') {
-                tabNuevo.classList.add('active');
-                tabBuscar.classList.remove('active');
-                btnNuevo.classList.add('active');
-                btnBuscar.classList.remove('active');
-            } else {
-                tabNuevo.classList.remove('active');
-                tabBuscar.classList.add('active');
-                btnNuevo.classList.remove('active');
-                btnBuscar.classList.add('active');
-            }
-        }
-    </script>
+      <!-- Detalle de Documentos -->
+      <section class="card documents-card">
+        <h3>Documentos Adjuntos</h3>
+        <ul class="document-list">
+          <li>Documento de Identidad (DNI/Pasaporte) <span class="tag success">Verificado</span></li>
+          <li>Comprobante de Domicilio <span class="tag success">Verificado</span></li>
+          <li>Formulario de Solicitud <span class="tag warning">En Revisión</span></li>
+        </ul>
+      </section>
 
-    <!-- Vincular el script JS como módulo -->
-    <script type="module" src="app.js"></script>
+      <!-- Panel de Control para Probar Cambios de Estado -->
+      <section class="card dev-controls">
+        <p><em>Simular cambio de estado (Prueba de lógica frontend):</em></p>
+        <button onclick="cambiarEstado('aprobado')">Aprobar Solicitud</button>
+        <button onclick="cambiarEstado('observado')">Requerir Documentación</button>
+        <button onclick="cambiarEstado('reset')">Reiniciar</button>
+      </section>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
