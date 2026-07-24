@@ -60,7 +60,7 @@
             <div class="filter-group">
                 <label><i class="fa-solid fa-filter"></i> Filtrar Estado:</label>
                 <select id="filter-estado" onchange="filtrarPedidos()">
-                    <option value="TODOS">Todos los estados</option>
+                    <option value="TODOS">Todos los estados activos</option>
                     <option value="Pendiente de Revisión">Pendientes</option>
                     <option value="Aprobado / En Cola">En Cola</option>
                     <option value="Imprimiendo">Imprimiendo</option>
@@ -75,7 +75,7 @@
                     <option value="CAL">Calidad</option>
                     <option value="MAN">Manufactura</option>
                     <option value="MCTO">MCTO</option>
-                    <option value="TI">TI</option>
+                    <option value="TI">Sistemas / TI</option>
                     <option value="ING">Ingeniería</option>
                     <option value="PROD">Producción</option>
                 </select>
@@ -88,16 +88,62 @@
         </main>
     </div>
 
-    <!-- MODAL PARA RECHAZAR PEDIDO -->
+    <!-- MODAL: FICHA TÉCNICA Y ASIGNACIÓN DE IMPRESORA -->
+    <div id="modal-tecnico" class="modal-backdrop hidden">
+        <div class="modal-card" style="max-width: 450px; text-align: left;">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <i class="fa-solid fa-print modal-icon" style="color: var(--primary); font-size: 2.2rem;"></i>
+                <h3 style="margin-top: 5px;">Asignación de Impresión</h3>
+                <p id="modal-tecnico-sub" style="font-size: 0.85rem; color: var(--text-muted);"></p>
+            </div>
+
+            <input type="hidden" id="modal-tecnico-codigo">
+
+            <div class="form-group">
+                <label for="select-impresora"><i class="fa-solid fa-print"></i> Impresora Asignada *</label>
+                <select id="select-impresora">
+                    <option value="Bambu">Bambu</option>
+                    <option value="Creality 5060">Creality 5060</option>
+                    <option value="Creality Sermoon">Creality Sermoon</option>
+                    <option value="Zortrax M300">Zortrax M300</option>
+                </select>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="input-gramos"><i class="fa-solid fa-weight-hanging"></i> Material (Gramos)</label>
+                    <input type="number" id="input-gramos" placeholder="Ej: 150" min="0">
+                </div>
+                <div class="form-group">
+                    <label for="input-material"><i class="fa-solid fa-vial"></i> Tipo Filamento</label>
+                    <select id="input-material">
+                        <option value="PLA">PLA</option>
+                        <option value="ABS">ABS</option>
+                        <option value="PETG">PETG</option>
+                        <option value="TPU (Flexible)">TPU (Flexible)</option>
+                        <option value="Nylon">Nylon / PA</option>
+                        <option value="Otro">Otro</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn btn-tab" onclick="cerrarModalTecnico()" style="flex:1;">Cancelar</button>
+                <button class="btn btn-primary" onclick="guardarDatosTecnicos()" style="flex:1;"><i class="fa-solid fa-save"></i> Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: RECHAZAR PEDIDO -->
     <div id="modal-rechazar" class="modal-backdrop hidden">
         <div class="modal-card">
             <div class="modal-icon" style="color: var(--accent-red);"><i class="fa-solid fa-circle-xmark"></i></div>
             <h3>Rechazar Solicitud</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-                Indica el motivo técnico o administrativo por el cual no se puede imprimir la pieza. El requisitor podrá leer este mensaje.
+                Indica el motivo técnico o administrativo por el cual no se puede imprimir la pieza.
             </p>
             <input type="hidden" id="modal-rechazar-codigo">
-            <textarea id="motivo-rechazo-text" rows="3" placeholder="Ej: El archivo carece de espesor suficiente / Falta especificación de material..." style="width: 100%; margin-bottom: 15px;"></textarea>
+            <textarea id="motivo-rechazo-text" rows="3" placeholder="Ej: Espesor insuficiente / Falta definición..." style="width: 100%; margin-bottom: 15px;"></textarea>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-tab" onclick="cerrarModalRechazo()" style="flex:1;">Cancelar</button>
                 <button class="btn btn-primary" onclick="confirmarRechazo()" style="background: var(--accent-red); color: #fff; flex:1;">Confirmar Rechazo</button>
