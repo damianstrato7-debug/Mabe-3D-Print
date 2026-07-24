@@ -19,14 +19,18 @@ const db = getDatabase(app);
 
 let todosLosPedidos = [];
 let seccionActual = "activos";
+let adminActual = sessionStorage.getItem("admin_3d_user") || "";
 
 // Instancias de gráficos Chart.js
 let chartMatInstance = null;
 let chartAreasInstance = null;
 let chartUsersInstance = null;
 let chartImpInstance = null;
+let chartAdminsInstance = null;
 
 // Exponer funciones globales
+window.confirmarLoginAdmin = confirmarLoginAdmin;
+window.cambiarUsuarioAdmin = cambiarUsuarioAdmin;
 window.cambiarSeccion = cambiarSeccion;
 window.cambiarEstado = cambiarEstado;
 window.abrirModalRechazo = abrirModalRechazo;
@@ -39,6 +43,30 @@ window.eliminarPedido = eliminarPedido;
 window.filtrarPedidosActivos = filtrarPedidosActivos;
 window.filtrarHistorial = filtrarHistorial;
 window.renderizarEstadisticas = renderizarEstadisticas;
+
+// Verificar Sesión Inicial de Administrador
+document.addEventListener("DOMContentLoaded", () => {
+    if (adminActual) {
+        document.getElementById('modal-login-admin').classList.add('hidden');
+        document.getElementById('current-admin-name').innerText = adminActual;
+    }
+});
+
+function confirmarLoginAdmin() {
+    const seleccionado = document.getElementById('select-admin-user').value;
+    if (seleccionado) {
+        adminActual = seleccionado;
+        sessionStorage.setItem("admin_3d_user", adminActual);
+        document.getElementById('current-admin-name').innerText = adminActual;
+        document.getElementById('modal-login-admin').classList.add('hidden');
+    }
+}
+
+function cambiarUsuarioAdmin() {
+    sessionStorage.removeItem("admin_3d_user");
+    adminActual = "";
+    document.getElementById('modal-login-admin').classList.remove('hidden');
+}
 
 // ==========================================
 // 2. ESCUCHA EN TIEMPO REAL
@@ -204,9 +232,9 @@ function crearTarjetaHTML(p, esHistorial) {
         `;
     }
 
+    let adminAsignadoHTML = p.atendidoPor ? `<p style="color: var(--accent-yellow); margin-top: 6px; font-size: 0.82rem;"><strong><i class="fa-solid fa-user-check"></i> Atendido por:</strong> ${p.atendidoPor}</p>` : '';
     let motivoRechazoHTML = p.motivoRechazo ? `<p style="color: var(--accent-red); margin-top: 5px; font-size: 0.82rem;"><strong>Motivo rechazo:</strong> ${p.motivoRechazo}</p>` : '';
 
-    // Botones dinámicos según si está activo o en el historial
     let accionesHTML = "";
     if (!esHistorial) {
         accionesHTML = `
@@ -247,6 +275,7 @@ function crearTarjetaHTML(p, esHistorial) {
                 <p style="margin-top: 6px;"><strong><i class="fa-solid fa-link"></i> Adjunto:</strong> ${linkHTML}</p>
                 
                 ${datosTecnicosHTML}
+                ${adminAsignadoHTML}
                 ${motivoRechazoHTML}
 
                 <p style="margin-top: 8px; font-size: 0.8rem; color: var(--text-muted);"><strong>Estado:</strong> <span style="color: var(--text-main); font-weight: bold;">${p.estado}</span></p>
@@ -264,7 +293,6 @@ function renderizarEstadisticas() {
     const rangoDias = document.getElementById('stats-time-range').value;
     const ahora = new Date();
 
-    // Filtrar por tiempo
     let pedidosFiltrados = todosLosPedidos.filter(p => {
         if (rangoDias === 'ALL') return true;
         const fechaPedido = new Date(p.fechaCreacion);
@@ -272,16 +300,20 @@ function renderizarEstadisticas() {
         return diferenciaDias <= parseInt(rangoDias);
     });
 
-    // Acumuladores
     let totalGramos = 0;
     let totalCompletados = 0;
     let contadorMateriales = {};
     let contadorAreas = {};
     let contadorUsuarios = {};
     let contadorImpresoras = {};
+    let contadorAdmins = {
+        "Guillermo Bunting": 0,
+        "Federico Menoyo": 0,
+        "German Bendazzi": 0,
+        "Damian Alvarez": 0
+    };
 
     pedidosFiltrados.forEach(p => {
-        // Gramos
         if (p.gramos && !isNaN(p.gramos)) {
             const g = parseFloat(p.gramos);
             totalGramos += g;
@@ -290,41 +322,28 @@ function renderizarEstadisticas() {
             contadorMateriales[mat] = (contadorMateriales[mat] || 0) + g;
         }
 
-        // Completados
         if (p.estado === 'Listo para Retiro') {
             totalCompletados++;
         }
 
-        // Áreas
-        if (p.area) {
-            contadorAreas[p.area] = (contadorAreas[p.area] || 0) + 1;
-        }
-
-        // Requisitores
-        if (p.requisitor) {
-            contadorUsuarios[p.requisitor] = (contadorUsuarios[p.requisitor] || 0) + 1;
-        }
-
-        // Impresoras
-        if (p.impresora) {
-            contadorImpresoras[p.impresora] = (contadorImpresoras[p.impresora] || 0) + 1;
+        if (p.area) contadorAreas[p.area] = (contadorAreas[p.area] || 0) + 1;
+        if (p.requisitor) contadorUsuarios[p.requisitor] = (contadorUsuarios[p.requisitor] || 0) + 1;
+        if (p.impresora) contadorImpresoras[p.impresora] = (contadorImpresoras[p.impresora] || 0) + 1;
+        
+        if (p.atendidoPor) {
+            contadorAdmins[p.atendidoPor] = (contadorAdmins[p.atendidoPor] || 0) + 1;
         }
     });
 
-    // Actualizar KPI Cards de Stats
     document.getElementById('stat-total-gramos').innerText = totalGramos >= 1000 ? (totalGramos / 1000).toFixed(2) + ' Kg' : Math.round(totalGramos) + ' g';
     document.getElementById('stat-total-completados').innerText = totalCompletados;
 
-    // Obtener Top Área
     const topArea = Object.keys(contadorAreas).reduce((a, b) => contadorAreas[a] > contadorAreas[b] ? a : b, '-');
     document.getElementById('stat-top-area-nombre').innerText = topArea !== '-' ? `${topArea} (${contadorAreas[topArea]})` : '-';
 
-    // Obtener Top Requisitor
     const topUser = Object.keys(contadorUsuarios).reduce((a, b) => contadorUsuarios[a] > contadorUsuarios[b] ? a : b, '-');
     document.getElementById('stat-top-user-nombre').innerText = topUser !== '-' ? `${topUser} (${contadorUsuarios[topUser]})` : '-';
 
-    // RENDERIZAR GRÁFICOS (Chart.js)
-    
     // 1. Gráfico Materiales
     const ctxMat = document.getElementById('chartMateriales').getContext('2d');
     if (chartMatInstance) chartMatInstance.destroy();
@@ -347,17 +366,10 @@ function renderizarEstadisticas() {
         type: 'bar',
         data: {
             labels: Object.keys(contadorAreas),
-            datasets: [{
-                label: 'Pedidos',
-                data: Object.values(contadorAreas),
-                backgroundColor: '#00e5ff'
-            }]
+            datasets: [{ label: 'Pedidos', data: Object.values(contadorAreas), backgroundColor: '#00e5ff' }]
         },
         options: {
-            scales: {
-                x: { ticks: { color: '#ffffff' } },
-                y: { ticks: { color: '#ffffff' }, beginAtZero: true }
-            },
+            scales: { x: { ticks: { color: '#ffffff' } }, y: { ticks: { color: '#ffffff' }, beginAtZero: true } },
             plugins: { legend: { display: false } }
         }
     });
@@ -372,18 +384,11 @@ function renderizarEstadisticas() {
         type: 'bar',
         data: {
             labels: top5UsersKeys,
-            datasets: [{
-                label: 'Solicitudes',
-                data: top5UsersValues,
-                backgroundColor: '#ffb703'
-            }]
+            datasets: [{ label: 'Solicitudes', data: top5UsersValues, backgroundColor: '#ffb703' }]
         },
         options: {
             indexAxis: 'y',
-            scales: {
-                x: { ticks: { color: '#ffffff' }, beginAtZero: true },
-                y: { ticks: { color: '#ffffff' } }
-            },
+            scales: { x: { ticks: { color: '#ffffff' }, beginAtZero: true }, y: { ticks: { color: '#ffffff' } } },
             plugins: { legend: { display: false } }
         }
     });
@@ -402,15 +407,37 @@ function renderizarEstadisticas() {
         },
         options: { plugins: { legend: { labels: { color: '#ffffff' } } } }
     });
+
+    // 5. Gráfico Administradores
+    const ctxAdmins = document.getElementById('chartAdmins').getContext('2d');
+    if (chartAdminsInstance) chartAdminsInstance.destroy();
+    chartAdminsInstance = new Chart(ctxAdmins, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(contadorAdmins),
+            datasets: [{ label: 'Pedidos Atendidos', data: Object.values(contadorAdmins), backgroundColor: '#a855f7' }]
+        },
+        options: {
+            scales: { x: { ticks: { color: '#ffffff' } }, y: { ticks: { color: '#ffffff' }, beginAtZero: true } },
+            plugins: { legend: { display: false } }
+        }
+    });
 }
 
 // ==========================================
 // 9. ACCIONES FIREBASE
 // ==========================================
 async function cambiarEstado(codigo, nuevoEstado, motivo = "") {
+    if (!adminActual) {
+        document.getElementById('modal-login-admin').classList.remove('hidden');
+        return;
+    }
+
     const codigoLimpio = codigo.replace('#', '');
     const updates = {};
     updates[`pedidos/${codigoLimpio}/estado`] = nuevoEstado;
+    updates[`pedidos/${codigoLimpio}/atendidoPor`] = adminActual;
+    
     if (motivo) {
         updates[`pedidos/${codigoLimpio}/motivoRechazo`] = motivo;
     }
@@ -436,6 +463,11 @@ function cerrarModalTecnico() {
 }
 
 async function guardarDatosTecnicos() {
+    if (!adminActual) {
+        document.getElementById('modal-login-admin').classList.remove('hidden');
+        return;
+    }
+
     const codigo = document.getElementById('modal-tecnico-codigo').value;
     const impresora = document.getElementById('select-impresora').value;
     const gramos = document.getElementById('input-gramos').value;
@@ -446,6 +478,7 @@ async function guardarDatosTecnicos() {
     updates[`pedidos/${codigoLimpio}/impresora`] = impresora;
     updates[`pedidos/${codigoLimpio}/gramos`] = gramos;
     updates[`pedidos/${codigoLimpio}/tipoMaterial`] = tipoMaterial;
+    updates[`pedidos/${codigoLimpio}/atendidoPor`] = adminActual;
 
     try {
         await update(ref(db), updates);
