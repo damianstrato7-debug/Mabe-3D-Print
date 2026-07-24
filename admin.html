@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Taller 3D - Mabe San Luis</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="bg-overlay"></div>
+
+    <div class="main-container admin-container">
+        <!-- Header Admin -->
+        <header class="header">
+            <div class="logo">
+                <i class="fa-solid fa-sliders logo-icon"></i>
+                <span>Gestión de Taller / <b>Mabe San Luis</b></span>
+            </div>
+            <p class="subtitle">Control y Aprobación de Impresiones 3D</p>
+        </header>
+
+        <!-- Resumen de Métricas (KPIs) -->
+        <div class="kpi-grid">
+            <div class="kpi-card kpi-yellow">
+                <i class="fa-solid fa-clock"></i>
+                <div>
+                    <span id="count-pendientes">0</span>
+                    <small>Pendientes</small>
+                </div>
+            </div>
+            <div class="kpi-card kpi-blue">
+                <i class="fa-solid fa-cube fa-spin"></i>
+                <div>
+                    <span id="count-imprimiendo">0</span>
+                    <small>En Impresión</small>
+                </div>
+            </div>
+            <div class="kpi-card kpi-green">
+                <i class="fa-solid fa-circle-check"></i>
+                <div>
+                    <span id="count-listos">0</span>
+                    <small>Listos p/ Entrega</small>
+                </div>
+            </div>
+            <div class="kpi-card kpi-red">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <div>
+                    <span id="count-urgentes">0</span>
+                    <small>Prioridad Alta</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtros de Búsqueda -->
+        <div class="glass-card filter-bar">
+            <div class="filter-group">
+                <label><i class="fa-solid fa-filter"></i> Filtrar Estado:</label>
+                <select id="filter-estado" onchange="filtrarPedidos()">
+                    <option value="TODOS">Todos los estados</option>
+                    <option value="Pendiente de Revisión">Pendientes</option>
+                    <option value="Aprobado / En Cola">En Cola</option>
+                    <option value="Imprimiendo">Imprimiendo</option>
+                    <option value="Listo para Retiro">Listos</option>
+                    <option value="Rechazado">Rechazados</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label><i class="fa-solid fa-industry"></i> Área:</label>
+                <select id="filter-area" onchange="filtrarPedidos()">
+                    <option value="TODAS">Todas las áreas</option>
+                    <option value="CAL">Calidad</option>
+                    <option value="MAN">Manufactura</option>
+                    <option value="MCTO">MCTO</option>
+                    <option value="TI">TI</option>
+                    <option value="ING">Ingeniería</option>
+                    <option value="PROD">Producción</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Lista de Pedidos en Tiempo Real -->
+        <main id="admin-pedidos-list" class="admin-grid">
+            <p class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Conectando con el taller en tiempo real...</p>
+        </main>
+    </div>
+
+    <!-- MODAL PARA RECHAZAR PEDIDO -->
+    <div id="modal-rechazar" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-icon" style="color: var(--accent-red);"><i class="fa-solid fa-circle-xmark"></i></div>
+            <h3>Rechazar Solicitud</h3>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
+                Indica el motivo técnico o administrativo por el cual no se puede imprimir la pieza. El requisitor podrá leer este mensaje.
+            </p>
+            <input type="hidden" id="modal-rechazar-codigo">
+            <textarea id="motivo-rechazo-text" rows="3" placeholder="Ej: El archivo carece de espesor suficiente / Falta especificación de material..." style="width: 100%; margin-bottom: 15px;"></textarea>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-tab" onclick="cerrarModalRechazo()" style="flex:1;">Cancelar</button>
+                <button class="btn btn-primary" onclick="confirmarRechazo()" style="background: var(--accent-red); color: #fff; flex:1;">Confirmar Rechazo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Admin de Firebase -->
+    <script type="module" src="admin.js"></script>
+</body>
+</html>
