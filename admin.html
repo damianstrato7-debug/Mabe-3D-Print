@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel Taller 3D - Mabe San Luis</title>
-    <!-- Google Fonts & FontAwesome -->
+    <!-- Google Fonts & FontAwesome & Chart.js -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -20,75 +21,204 @@
                 <i class="fa-solid fa-sliders logo-icon"></i>
                 <span>Gestión de Taller / <b>Mabe San Luis</b></span>
             </div>
-            <p class="subtitle">Control y Aprobación de Impresiones 3D</p>
+            <p class="subtitle">Control, Historial y Métricas de Impresión 3D</p>
         </header>
 
-        <!-- Resumen de Métricas (KPIs) -->
-        <div class="kpi-grid">
-            <div class="kpi-card kpi-yellow">
-                <i class="fa-solid fa-clock"></i>
-                <div>
-                    <span id="count-pendientes">0</span>
-                    <small>Pendientes</small>
-                </div>
-            </div>
-            <div class="kpi-card kpi-blue">
-                <i class="fa-solid fa-cube fa-spin"></i>
-                <div>
-                    <span id="count-imprimiendo">0</span>
-                    <small>En Impresión</small>
-                </div>
-            </div>
-            <div class="kpi-card kpi-green">
-                <i class="fa-solid fa-circle-check"></i>
-                <div>
-                    <span id="count-listos">0</span>
-                    <small>Listos p/ Entrega</small>
-                </div>
-            </div>
-            <div class="kpi-card kpi-red">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-                <div>
-                    <span id="count-urgentes">0</span>
-                    <small>Prioridad Alta</small>
-                </div>
-            </div>
+        <!-- Barra de Pestañas (Tabs) -->
+        <div class="glass-card" style="display: flex; gap: 10px; padding: 10px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;">
+            <button id="tab-btn-activos" class="btn btn-primary" onclick="cambiarSeccion('activos')">
+                <i class="fa-solid fa-cube"></i> En Curso / Pendientes (<span id="count-badge-activos">0</span>)
+            </button>
+            <button id="tab-btn-historial" class="btn btn-tab" onclick="cambiarSeccion('historial')">
+                <i class="fa-solid fa-box-archive"></i> Historial / Finalizados (<span id="count-badge-historial">0</span>)
+            </button>
+            <button id="tab-btn-stats" class="btn btn-tab" onclick="cambiarSeccion('stats')">
+                <i class="fa-solid fa-chart-column"></i> Estadísticas & Métricas
+            </button>
         </div>
 
-        <!-- Filtros de Búsqueda -->
-        <div class="glass-card filter-bar">
-            <div class="filter-group">
-                <label><i class="fa-solid fa-filter"></i> Filtrar Estado:</label>
-                <select id="filter-estado" onchange="filtrarPedidos()">
-                    <option value="TODOS">Todos los estados activos</option>
-                    <option value="Pendiente de Revisión">Pendientes</option>
-                    <option value="Aprobado / En Cola">En Cola</option>
-                    <option value="Imprimiendo">Imprimiendo</option>
-                    <option value="Listo para Retiro">Listos</option>
-                    <option value="Rechazado">Rechazados</option>
-                </select>
+        <!-- ========================================== -->
+        <!-- SECCIÓN 1: PEDIDOS EN CURSO / PENDIENTES   -->
+        <!-- ========================================== -->
+        <section id="sec-activos">
+            <!-- KPIs Activos -->
+            <div class="kpi-grid">
+                <div class="kpi-card kpi-yellow">
+                    <i class="fa-solid fa-clock"></i>
+                    <div>
+                        <span id="count-pendientes">0</span>
+                        <small>Pendientes</small>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-blue">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <div>
+                        <span id="count-cola">0</span>
+                        <small>En Cola</small>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-blue">
+                    <i class="fa-solid fa-spinner fa-spin"></i>
+                    <div>
+                        <span id="count-imprimiendo">0</span>
+                        <small>Imprimiendo</small>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-red">
+                    <i class="fa-solid fa-bolt"></i>
+                    <div>
+                        <span id="count-urgentes">0</span>
+                        <small>Prioridad Alta</small>
+                    </div>
+                </div>
             </div>
-            <div class="filter-group">
-                <label><i class="fa-solid fa-industry"></i> Área:</label>
-                <select id="filter-area" onchange="filtrarPedidos()">
-                    <option value="TODAS">Todas las áreas</option>
-                    <option value="CAL">Calidad</option>
-                    <option value="MAN">Manufactura</option>
-                    <option value="MCTO">MCTO</option>
-                    <option value="TI">Sistemas / TI</option>
-                    <option value="ING">Ingeniería</option>
-                    <option value="PROD">Producción</option>
-                </select>
-            </div>
-        </div>
 
-        <!-- Lista de Pedidos en Tiempo Real -->
-        <main id="admin-pedidos-list" class="admin-grid">
-            <p class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Conectando con el taller en tiempo real...</p>
-        </main>
+            <!-- Filtros Activos -->
+            <div class="glass-card filter-bar">
+                <div class="filter-group">
+                    <label><i class="fa-solid fa-filter"></i> Estado Activo:</label>
+                    <select id="filter-estado-activo" onchange="filtrarPedidosActivos()">
+                        <option value="TODOS">Todos en curso</option>
+                        <option value="Pendiente de Revisión">Pendiente de Revisión</option>
+                        <option value="Aprobado / En Cola">En Cola</option>
+                        <option value="Imprimiendo">Imprimiendo</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fa-solid fa-industry"></i> Área:</label>
+                    <select id="filter-area-activo" onchange="filtrarPedidosActivos()">
+                        <option value="TODAS">Todas las áreas</option>
+                        <option value="CAL">Calidad</option>
+                        <option value="MAN">Manufactura</option>
+                        <option value="MCTO">MCTO</option>
+                        <option value="TI">Sistemas / TI</option>
+                        <option value="ING">Ingeniería</option>
+                        <option value="PROD">Producción</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Lista Activa -->
+            <main id="admin-activos-list" class="admin-grid">
+                <p class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Cargando pedidos en curso...</p>
+            </main>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECCIÓN 2: HISTORIAL / ARCHIVADOS          -->
+        <!-- ========================================== -->
+        <section id="sec-historial" class="hidden">
+            <div class="glass-card filter-bar">
+                <div class="filter-group">
+                    <label><i class="fa-solid fa-filter"></i> Tipo de Archivo:</label>
+                    <select id="filter-estado-historial" onchange="filtrarHistorial()">
+                        <option value="TODOS">Listos y Rechazados</option>
+                        <option value="Listo para Retiro">Completados / Listos</option>
+                        <option value="Rechazado">Rechazados</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label><i class="fa-solid fa-industry"></i> Área:</label>
+                    <select id="filter-area-historial" onchange="filtrarHistorial()">
+                        <option value="TODAS">Todas las áreas</option>
+                        <option value="CAL">Calidad</option>
+                        <option value="MAN">Manufactura</option>
+                        <option value="MCTO">MCTO</option>
+                        <option value="TI">Sistemas / TI</option>
+                        <option value="ING">Ingeniería</option>
+                        <option value="PROD">Producción</option>
+                    </select>
+                </div>
+            </div>
+
+            <main id="admin-historial-list" class="admin-grid">
+                <p class="loading-text"><i class="fa-solid fa-spinner fa-spin"></i> Cargando historial...</p>
+            </main>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- SECCIÓN 3: ESTADÍSTICAS & MÉTRICAS         -->
+        <!-- ========================================== -->
+        <section id="sec-stats" class="hidden">
+            <!-- Filtro de Tiempo para Estadísticas -->
+            <div class="glass-card filter-bar" style="margin-bottom: 20px;">
+                <div class="filter-group" style="width: 100%; max-width: 350px; margin: 0 auto;">
+                    <label><i class="fa-solid fa-calendar-days"></i> Rango Temporal de Análisis:</label>
+                    <select id="stats-time-range" onchange="renderizarEstadisticas()">
+                        <option value="30">Últimos 30 días</option>
+                        <option value="90">Últimos 90 días</option>
+                        <option value="365">Este último año</option>
+                        <option value="ALL" selected>Todo el historial disponible</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Resumen Rápido Stats -->
+            <div class="kpi-grid" style="margin-bottom: 25px;">
+                <div class="kpi-card kpi-blue">
+                    <i class="fa-solid fa-weight-hanging"></i>
+                    <div>
+                        <span id="stat-total-gramos">0 g</span>
+                        <small>Filamento Consumido</small>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-green">
+                    <i class="fa-solid fa-check-double"></i>
+                    <div>
+                        <span id="stat-total-completados">0</span>
+                        <small>Impresiones Completadas</small>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-yellow">
+                    <i class="fa-solid fa-building-user"></i>
+                    <div>
+                        <span id="stat-top-area-nombre">-</span>
+                        <small>Área con Más Pedidos</small>
+                    </div>
+                </div>
+                <div class="kpi-card kpi-red">
+                    <i class="fa-solid fa-user-gear"></i>
+                    <div>
+                        <span id="stat-top-user-nombre">-</span>
+                        <small>Top Requisitor</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gráficos -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                <!-- Consumo Material -->
+                <div class="glass-card" style="padding: 20px; text-align: center;">
+                    <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--primary);"><i class="fa-solid fa-chart-pie"></i> Consumo de Filamento (Gramos)</h3>
+                    <div style="max-width: 280px; margin: 0 auto;">
+                        <canvas id="chartMateriales"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Áreas -->
+                <div class="glass-card" style="padding: 20px; text-align: center;">
+                    <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--primary);"><i class="fa-solid fa-chart-bar"></i> Top Áreas Solicitantes</h3>
+                    <canvas id="chartAreas"></canvas>
+                </div>
+
+                <!-- Top Requisitores -->
+                <div class="glass-card" style="padding: 20px; text-align: center;">
+                    <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--primary);"><i class="fa-solid fa-users"></i> Top Requisitores</h3>
+                    <canvas id="chartUsuarios"></canvas>
+                </div>
+
+                <!-- Impresoras Asignadas -->
+                <div class="glass-card" style="padding: 20px; text-align: center;">
+                    <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--primary);"><i class="fa-solid fa-print"></i> Carga por Impresora</h3>
+                    <div style="max-width: 280px; margin: 0 auto;">
+                        <canvas id="chartImpresoras"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- MODAL: FICHA TÉCNICA Y ASIGNACIÓN DE IMPRESORA -->
+    <!-- MODAL: FICHA TÉCNICA -->
     <div id="modal-tecnico" class="modal-backdrop hidden">
         <div class="modal-card" style="max-width: 450px; text-align: left;">
             <div style="text-align: center; margin-bottom: 15px;">
@@ -140,7 +270,7 @@
             <div class="modal-icon" style="color: var(--accent-red);"><i class="fa-solid fa-circle-xmark"></i></div>
             <h3>Rechazar Solicitud</h3>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 15px;">
-                Indica el motivo técnico o administrativo por el cual no se puede imprimir la pieza.
+                Indica el motivo técnico o administrativo por el cual se rechaza.
             </p>
             <input type="hidden" id="modal-rechazar-codigo">
             <textarea id="motivo-rechazo-text" rows="3" placeholder="Ej: Espesor insuficiente / Falta definición..." style="width: 100%; margin-bottom: 15px;"></textarea>
