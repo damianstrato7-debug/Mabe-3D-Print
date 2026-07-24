@@ -14,12 +14,48 @@
 
     <div class="bg-overlay"></div>
 
+    <!-- PANTALLA / MODAL DE LOGIN ADMINISTRADOR -->
+    <div id="modal-login-admin" class="modal-backdrop" style="background: rgba(10, 25, 47, 0.95); z-index: 9999;">
+        <div class="glass-card modal-card" style="max-width: 420px; text-align: center; padding: 30px;">
+            <i class="fa-solid fa-user-shield" style="font-size: 3rem; color: var(--primary); margin-bottom: 15px;"></i>
+            <h2>Identificación de Operador</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                Selecciona tu nombre para ingresar al panel del taller 3D:
+            </p>
+
+            <div class="form-group" style="margin-bottom: 20px; text-align: left;">
+                <label for="select-admin-user"><i class="fa-solid fa-user-gear"></i> Administrador en Turno:</label>
+                <select id="select-admin-user" style="width: 100%; padding: 12px; font-size: 1rem;">
+                    <option value="Guillermo Bunting">Guillermo Bunting</option>
+                    <option value="Federico Menoyo">Federico Menoyo</option>
+                    <option value="German Bendazzi">Germán Bendazzi</option>
+                    <option value="Damian Alvarez">Damián Alvarez</option>
+                </select>
+            </div>
+
+            <button class="btn btn-primary" onclick="confirmarLoginAdmin()" style="width: 100%; padding: 12px; font-size: 1rem;">
+                <i class="fa-solid fa-right-to-bracket"></i> Ingresar al Panel
+            </button>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
     <div class="main-container admin-container">
         <!-- Header Admin -->
         <header class="header">
-            <div class="logo">
-                <i class="fa-solid fa-sliders logo-icon"></i>
-                <span>Gestión de Taller / <b>Mabe San Luis</b></span>
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <div class="logo">
+                    <i class="fa-solid fa-sliders logo-icon"></i>
+                    <span>Gestión de Taller / <b>Mabe San Luis</b></span>
+                </div>
+                <!-- Indicador de Administrador Activo -->
+                <div id="admin-badge-container" class="glass-card" style="padding: 6px 15px; font-size: 0.85rem; display: flex; align-items: center; gap: 10px;">
+                    <span style="color: var(--text-muted);"><i class="fa-solid fa-user-check" style="color: var(--accent-green);"></i> Operador:</span>
+                    <strong id="current-admin-name" style="color: var(--primary);">--</strong>
+                    <button onclick="cambiarUsuarioAdmin()" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.8rem; margin-left: 5px;" title="Cambiar usuario">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </button>
+                </div>
             </div>
             <p class="subtitle">Control, Historial y Métricas de Impresión 3D</p>
         </header>
@@ -212,6 +248,14 @@
                     <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--primary);"><i class="fa-solid fa-print"></i> Carga por Impresora</h3>
                     <div style="max-width: 280px; margin: 0 auto;">
                         <canvas id="chartImpresoras"></canvas>
+                    </div>
+                </div>
+
+                <!-- Productividad de Administradores -->
+                <div class="glass-card" style="padding: 20px; text-align: center; grid-column: 1 / -1;">
+                    <h3 style="margin-bottom: 15px; font-size: 1rem; color: var(--primary);"><i class="fa-solid fa-user-check"></i> Pedidos Procesados por Administrador</h3>
+                    <div style="max-width: 500px; margin: 0 auto;">
+                        <canvas id="chartAdmins"></canvas>
                     </div>
                 </div>
             </div>
