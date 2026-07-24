@@ -70,7 +70,7 @@ function actualizarKPIs() {
 }
 
 // ==========================================
-// 4. RENDERIZADO Y FILTRADO
+// 4. RENDERIZADO Y FILTRADO (CORREGIDO)
 // ==========================================
 function filtrarPedidos() {
     const estadoFiltro = document.getElementById('filter-estado').value;
@@ -78,7 +78,14 @@ function filtrarPedidos() {
     const contenedor = document.getElementById('admin-pedidos-list');
 
     let filtrados = todosLosPedidos.filter(p => {
-        const cumpleEstado = (estadoFiltro === "TODOS" || p.estado === estadoFiltro);
+        // Si el filtro es "TODOS", ocultamos los Rechazados automáticamente para no ensuciar la lista activa
+        let cumpleEstado = false;
+        if (estadoFiltro === "TODOS") {
+            cumpleEstado = (p.estado !== "Rechazado");
+        } else {
+            cumpleEstado = (p.estado === estadoFiltro);
+        }
+
         const cumpleArea = (areaFiltro === "TODAS" || p.area === areaFiltro);
         return cumpleEstado && cumpleArea;
     });
@@ -87,7 +94,7 @@ function filtrarPedidos() {
         contenedor.innerHTML = `
             <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted);">
                 <i class="fa-solid fa-inbox" style="font-size: 2.5rem; margin-bottom: 10px;"></i>
-                <p>No hay solicitudes que coincidan con los filtros seleccionados.</p>
+                <p>No hay solicitudes activas que coincidan con los filtros seleccionados.</p>
             </div>
         `;
         return;
@@ -161,7 +168,7 @@ function cerrarModalRechazo() {
     document.getElementById('modal-rechazar').classList.add('hidden');
 }
 
-function confirmarRechazo() {
+async function confirmarRechazo() {
     const codigo = document.getElementById('modal-rechazar-codigo').value;
     const motivo = document.getElementById('motivo-rechazo-text').value.trim();
 
@@ -170,6 +177,7 @@ function confirmarRechazo() {
         return;
     }
 
-    cambiarEstado(codigo, 'Rechazado', motivo);
+    await cambiarEstado(codigo, 'Rechazado', motivo);
     cerrarModalRechazo();
+    filtrarPedidos(); // Forzar la actualización visual inmediata
 }
